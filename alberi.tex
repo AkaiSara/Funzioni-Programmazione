@@ -1,0 +1,286 @@
+\chapter{Alberi binari}
+\section{Costruzione di alberi}
+\subsection{Struttura albero}
+\begin{codice}
+
+struct nodo{
+int info; 
+nodo* left,*right; 
+nodo(int a=0, nodo* b=0, nodo*c=0){info=a; left=b;right=c;}
+};
+\end{codice}
+
+\section{Funzione buildtree per costruire l’albero}
+\begin{codice}
+
+nodo* buildtree(nodo* r, int n) {
+if(!n) return r;
+int num;
+cin>>num;
+r = bilanciato(r,num);
+return buildtree(r,n-1);
+}
+\end{codice}
+
+\section{Funzione bilanciato per bilanciare l’albero(necessario)}
+\begin{codice}
+
+nodo* bilanciato(nodo* r, int k) {
+if(!r) return new nodo(k,0,0);
+if(contanodi(r->left)<=contanodi(r->right)) r->left=bilanciato(r->left, k);
+else r->right=bilanciato(r->right, k);
+}
+\end{codice}
+
+\section{Funzione contanodi per contare il numero di nodi dell’albero}
+\begin{codice}
+
+int contanodi(nodo* R) {
+if(!R) return 0;
+return 1+contanodi(R->left)+contanodi(R->right);
+}
+\end{codice}
+
+\section{Stampa di un albero}
+\subsection{Lineare}
+\begin{codice}
+
+void stampa_l(nodo* r) {    
+//ricorsivo, stampa sottoalbero sx e sottoalbero dx
+if(r){
+    cout<<r->info<<'(';
+    stampa(r->left);
+    cout<<',';
+    stampa(r->right);
+    cout<<')';
+}
+else cout << '_';
+}
+\end{codice}
+
+\subsection{Infissa}
+\begin{codice}
+
+void infix(nodo *x) {
+if(x) {
+infix(x->left);  //stampa albero sinistro
+cout<<x->info<<' '; //stampa nodo
+infix(x->right);  //stampa albero destro
+}
+}
+\end{codice}
+
+\subsection{Prefissa a salti}
+\begin{codice}
+
+int stampa_a_salti(nodo* r, int k, int n) {  //stampa un nodo ogni k attraversati
+if(!r) return n;
+int salti;
+if(n==1) {
+    cout << r->info << " ";
+    n=k;	
+}
+else n--;
+salti=stampa_a_salti(r->left, k, n);
+return stampa_a_salti(r->right, k, salti);
+}
+\end{codice}
+
+\section{Cercare cammino in un albero}
+\begin{codice}
+
+bool cerca_cam(nodo* r, int k, int y, int* C) { 
+//ritorna true se c' e' e in tal caso si trova in C
+if(r->info==y) k=k-1;
+if(k<0) return false;
+if(!r->left && !r->right) {
+    if(k==0) {
+        *C=-1;
+        return true;
+    }
+    return false;
+}
+if(r->left) {
+    if(cerca_cam(r->left, k, y, C+1)) {
+        *C=0;
+        return true;
+    }
+}
+if(r->right) {
+    if(cerca_cam(r->right, k, y, C+1)) {
+        *C=1;
+        return true;
+    }
+}
+return false;
+}
+\end{codice}
+
+
+\section{Restituire una lista ordinata} 
+\textbf{che consiste di un numero di nodi pari a quelli di un albero e i cui campi info sono gli stessi dell' albero}
+\begin{codice}
+
+nodo* buildList(nodoA* r) {
+if(!r) return NULL;
+return fuse(new nodo(r->info), fuse(buildList(r->left),buildList(r->right)));
+}
+\end{codice}
+
+\subsection{Restituire la lista ordinata costruita disponendo in ordine i nodi L1 e L2} \textbf{(necessaria alla funzione sopra)}
+\begin{codice}
+
+nodo* fuse(nodo* L1, nodo* L2) {
+coda Q=coda();
+while(L1||L2) {
+    if(L1 && L2) {
+        nodo* t;
+        if(L1->info<=L2->info) {
+            t=L1->next;
+            push(L1, Q);
+            L1=t;
+        } else {
+            t=L2->next;
+            push(L2,Q);
+            L2=t;
+        }
+    } else if(L1) {
+        push_list(L1,Q);
+        L1=NULL;
+    } else {
+        push_list(L2,Q);
+        L2=NULL;
+    }
+}
+return Q.inizio;
+}
+\end{codice}
+
+\subsection{Inserire un valore in un albero in modo che sia ordinato} 
+\textbf{(e conseguente buildtree)}
+\begin{codice}
+
+nodoA* insert(nodoA*r, char y) {
+if(!r) return new nodoA(y);
+
+if(conta_n(r->left)<=conta_n(r->right))
+r->left=insert(r->left,y);
+else   
+r->right=insert(r->right,y);
+return r;
+}
+nodoA* buildtree(nodoA*r, int dim) {
+if(dim)
+{
+char z;
+cin>>z;
+nodoA*x=insert(r,z);
+return buildtree(x,dim-1);
+}
+return r;
+}
+\end{codice}
+
+\section{Restituisce la lista concatenata i cui nodi puntano ai nodi dell’albero ordinati secondo l’ordine infisso} 
+\textbf{tali che il primo nodo nella lista punti al nodo n-esimo dell’albero secondo l’ordine infisso, e i successivi nodi puntano ad un nodo dell’albero ogni k nodi sempre secondo l’ordine infisso}
+\begin{codice}
+
+nodo* B(nodoA* r, int k, int &n) {
+if(!r) return 0;
+nodo* sx, *dx, *c;
+sx=B(r->left, k, n);
+if(n==1) {
+    c=new nodo(r, NULL);
+    n=k;
+    sx=fuse(sx, c);
+} else n=n-1;
+dx=B(r->right, k ,n);
+return fuse(sx, dx);
+}
+\end{codice}
+
+\section{Contare le foglie di un albero}
+\begin{codice}
+
+int ContaFoglie(nodo* n)
+{
+if(!n) return(0);
+else {
+    if ((n->left==NULL) && (n->right==NULL)) return(1);
+    else return ContaFoglie(n->left) + ContaFoglie(n->right);
+}
+}
+\end{codice}
+
+\section{Sapere se un albero è perfettamente bilanciato}
+\begin{codice}
+
+bool PerfBil(nodo* n)
+{
+if (!n) return(true);
+else {
+if ((n->left==NULL) && (n->right==NULL)) // Se il nodo e' una foglia
+  return(true);
+else {
+  if ((n->left!=NULL) && (n->right!=NULL))
+    // Paraticamente: se il nodo ha tutti e due i figli..
+    return( PerfBil(n->left) && PerfBil(n->right) );
+  else return(false);
+}
+}
+}
+\end{codice}
+
+\section{Trovare e restituire un nodo con campo info = y}
+\begin{codice}
+
+nodo* trova(nodo* x, char y) {
+if(!x) return 0; //se e' vuoto fallisce la ricerca
+if(x->info==y) return x; //se e' quello restituisce il nodo
+nodo* z=trova(x->left, y); //sottoalbero sx
+if(z==0) return z;
+return trova(x->right);
+}
+\end{codice}
+
+\section{Trovare l’altezza di un albero}
+\begin{codice}
+
+int altezza(nodo*x) {
+if(!x->left && !x->right) return 0;
+int a=-1, b=-1;
+if(x->left) a=altezza(x->left);
+if(x->right) b=altezza(x->right);
+if(a>b) return a+1;
+else return b+1;
+}
+\end{codice}
+
+\section{Seguire un percorso dato in un albero}
+\begin{codice}
+
+nodo* trova(nodo *x, int *C, int lung) {
+if(!x) return 0; //fallito
+if(lung==0) return x;  //trovato
+if(*C==0) return trova(x->left, C+1, lung-1);  //C=0 vuol dire sx
+else return trova(x->right, C+1, lung-1);
+}
+\end{codice}
+
+\section{Da un albero, ricavare una lista dei nodi con campo info = y ricorsivamente}
+\begin{codice}
+
+punt* conc(punt*a,punt*b){
+if(!a) return b;
+a->next=conc(a->next,b);
+return a;
+}
+punt* buildList(nodo*r,int y){ //albero(r), y e' un intero uguale ad un campo info
+if(!r) return 0;
+punt*a=buildList(r->left,1);
+punt*b=buildList(r->right,1);
+if(r->info==y)
+    b=new punt(r,b);
+return conc(a,b);	
+}
+\end{codice}

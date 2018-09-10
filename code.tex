@@ -1,0 +1,120 @@
+\chapter{Code e FIFO}
+\section{Libreria che gestisce le code}
+\subsection{-code.h}
+\begin{codice}
+
+#include<iostream>
+struct nodo {
+    char chiave;
+    nodo *next;
+    nodo(char c='\0', nodo* n=NULL);
+};
+struct coda {
+    nodo *inizio;
+    nodo *fine;
+    coda(nodo* i=NULL, nodo* f=NULL);
+};
+
+void push(char c, coda &Q);
+char pop(coda &Q);
+bool e_vuota(coda Q);
+\end{codice}
+
+	\subsection{-code.cpp}
+\begin{codice}
+
+#include<iostream>
+#include "code.h"
+nodo::nodo(char c, nodo* n) {chiave=c; next=n;}
+coda::coda(nodo* i, nodo* f) {inizio=i; fine=f;}
+void push(char c, coda &Q) { //push:aggiunge un nuovo elemento alla fine 
+// della coda
+    if(!Q.inizio) {
+        Q.inizio=new nodo(c, 0);
+        Q.fine=Q.inizio;
+    }
+    else {
+        Q.fine->next=new nodo(c,0);
+        Q.fine=Q.fine->next;
+    }
+}
+void pushList(nodo*L,coda & Q) { //pushList: inserisce una nuova lista alla 
+// fine della coda
+    if(L) {
+        nodo* t=L->next;
+        push(L,Q);
+        pusLlist(t, Q);
+    }
+}
+
+char pop(coda &Q) { // pop: elimina il primo elemento della coda e lo ritorna
+    char key=(Q.inizio)->chiave;
+    nodo* del=Q.inizio;
+    Q.inizio=(Q.inizio)->next;
+    if(!Q.inizio) Q.fine=NULL;
+    delete del;
+    return key;
+}
+bool eVuota(coda Q) { // eVuota : ritorna true sse la coda e' vuota
+    return(!Q.inizio);
+}
+\end{codice}
+
+\section{Strutture di FIFO e nodi FIFO}
+
+\begin{codice}
+struct FIFO { //implementazione della struttura coda
+    nodo* primo, *ultimo; 
+    int dim; 
+    FIFO(nodo*a=0,nodo*b=0,int c=0){
+        primo=a; ultimo=b; dim=c;}
+};
+
+struct nodoFIFO{ //per creare liste di FIFO
+    FIFO info; 
+    nodoFIFO* next; 
+    nodoFIFO(FIFO a=FIFO(), nodoFIFO*b=0){
+        info=a; next=b;}
+};
+\end{codice}
+
+\section{Inserimento di un nodo all'inizio della FIFO}
+
+\begin{codice}
+FIFO push_begin(FIFO a, nodo* b){
+    if(!a.primo){
+        a.primo=a.ultimo=b; 
+        b->next=0; return a;
+    }
+    else{
+        b->next=a.primo;
+        a.primo=b;
+        return a;
+        }
+}
+
+\end{codice}
+
+\section{Inserimento di un nodo alla fine della FIFO}
+
+\begin{codice}
+FIFO push_end(FIFO a, nodo*b){
+	b->next=0;
+	if(!a.primo)
+        a.primo=a.ultimo=b;
+    else{
+        a.ultimo->next=b; 
+        a.ultimo=b;
+        }
+	return a;
+}
+\end{codice}
+
+\section{Concatenazione di due FIFO}
+\begin{codice}
+FIFO concF(FIFO a, FIFO b){
+	a.ultimo->next = b.primo;
+	a.ultimo = b.ultimo;
+	return a;
+}
+\end{codice}

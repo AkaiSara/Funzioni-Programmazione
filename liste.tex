@@ -1,0 +1,153 @@
+\chapter{Liste e nodi}
+\section{Struttura nodo}
+\begin{codice}
+
+struct nodo{
+	int info; 
+	nodo* next; 
+	nodo(int a=0, nodo*b=0){info=a; next=b;}
+}
+\end{codice}
+
+\section{Creazione ricorsiva di una lista}
+\subsection{Con sentinella}
+\begin{codice}
+
+nodo* leggi() {
+    int n;
+    cin >> n;
+    if(n==-1) return 0;
+    else return new nodo(n, leggi());
+}
+\end{codice}
+
+\subsection{Data la dimensione}
+\begin{codice}
+
+nodo* crea(int dim){
+   if(dim){
+    	int x;
+    	cin>>x;
+    	return new nodo(x,crea(dim-1));
+   }
+   return 0;
+}
+\end{codice}
+
+\section{Ricerca di un valore in una lista (ritorna l’indice (intero) del nodo)}
+\begin{codice}
+
+int ricerca(nodo* L, int x) {
+    if(L==0) return -1;
+    if(L->info==x) return 0;
+    if(ricerca(L->next, x)==-1) return -1;
+    else return 1+ricerca(L->next, x);
+}
+\end{codice}
+
+\section{Inserimento di un nodo nel posto giusto (ordine crescente)}
+\begin{codice}
+
+nodo* inserisci(nodo* L, int x) {
+    if (L==0) return new nodo(x,0);
+    if(L->info>x) return new nodo(x, L);
+    else return new nodo(L->info, inserisci(L->next,x));
+}
+\end{codice}
+
+\section{Stampa di una lista}
+
+
+\subsection{Stampa semplice}
+\begin{codice}
+
+void stampa(nodo* L) {
+    if(L) {
+        cout << L->info << " ";
+        stampa(L->next);
+    }
+}
+\end{codice}
+
+\subsection{Stampa elaborata}
+\begin{codice}
+
+void stampa_lista(nodo* L) {
+    if(L==0) cout << "Lista vuota" << endl;
+    else {
+        cout <<L->info;
+        if(L->next==0) cout << endl;
+        else {
+            cout << "->";
+            stampa_lista(L->next);
+        }
+    } 
+}
+\end{codice}
+
+
+\section{Pattern matching}
+\subsection{Funzione che ritorna true se c’è match}
+\begin{codice}
+
+bool testa(nodo*& y, int* P, int dimP, nodo*& m){
+if(!dimP) {  //caso base: pattern vuoto => match vero
+    m=y;
+          y=0;
+    return true;
+}
+if(!y) return false; //secondo caso base: lista vuota
+if(y->info==*P) return testa(y->next, P+1, dimP-1, m); //primo match: ricorsione
+return false; //altrimenti niente match
+}
+\end{codice}
+
+\subsection{Return match e resto della lista per riferimento}
+\begin{codice}
+
+//per riferimento il resto della lista e con il return la lista matchata
+nodo* match(nodo* &L, int* P, int dimP) {
+if(!L) return 0;
+nodo* r=L, *m;  //r e' il puntatore all'inizio (ricorsivo) della lista
+if(testa(r, P, dimP, m)) {  //se ha trovato il match...
+// (dobbiamo costruire la lista restante)
+    L=m; //"salta" il match e lo mette (riferimento) in L
+    return r; //restituisce la lista del match
+}
+else return match(L->next, P, dimP);
+}
+\end{codice}
+
+\subsection{Per riferimento il matche e il resto col return}
+\begin{codice}
+
+//per riferimento la lista matchata e il resto col return
+nodo* match(nodo* &L, int* P, int dimP) {
+if(!L) return 0;
+nodo *r=L, *m;
+if(testa(r, P, dimP, m)) {
+    L=r;
+    return m;
+}
+else {
+    L=L->next;
+    r->next=match(L, P, dimP);
+    return r;
+}
+}
+\end{codice}
+
+\section{Concatenazione}
+\subsection{Concatenazione iterativa}
+\begin{codice}
+nodo* conc(nodo*L1, nodo*L2){
+    if(!L1) return L2;
+    if(!L2) return L1;
+    nodo* x=L1;
+    while(x->next)
+        x=x->next;
+    x->next=L2;
+    return L1;
+}
+\end{codice}
+

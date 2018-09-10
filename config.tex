@@ -1,0 +1,47 @@
+\documentclass[12pt,a4paper]{book}
+
+    \usepackage[english,italian]{babel}
+    \usepackage[utf8]{inputenc}
+    \usepackage[T1]{fontenc}
+    
+    \usepackage{enumitem} %lists
+   
+    \usepackage{mathtools} %math package
+    \usepackage{amssymb}
+    \usepackage{amsmath}
+    \usepackage{amsthm}
+
+ \usepackage{listings} %coding environment 
+
+\usepackage{geometry}
+\geometry{a4paper,top=2.5cm,bottom=3cm,left=2.5cm,right=2.5cm,bindingoffset=0mm}%margini
+\raggedbottom %evita di aggiungere spazi
+
+\usepackage[usenames]{color} %Per permettere la colorazione dei caratteri 
+\definecolor{orange}{rgb}{1,0.647,0}
+\definecolor{cornflowerblue}{rgb}{0.392,0.584,0.929}
+\definecolor{green}{rgb}{0, 0.902, 0.451}
+\lstnewenvironment{codice}[1]
+{	\lstset
+	{	basicstyle=\ttfamily,
+		columns=fullflexible,				
+		basicstyle=\footnotesize \ttfamily,
+  		keywordstyle=\bfseries\color{orange},
+ 		commentstyle=\color{green},
+  		%identifierstyle=\color{cyano},
+ 		stringstyle=\color{cornflowerblue},
+		language=C++,
+		%float,
+		showstringspaces=false
+	}
+	\lstset
+	{	numbers=left,
+		numberstyle=\tiny,
+		stepnumber=1,
+		numbersep=15pt
+	}
+}{}
+
+    \usepackage{hyperref}
+    \hypersetup{hidelinks}
+    
